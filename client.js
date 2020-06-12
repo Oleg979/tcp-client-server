@@ -1,29 +1,46 @@
 ///////////////////////////////////////////////////////////////////////
 /// Config
+// Импортируем модуль для работы с tcp server
 const net = require("net");
-const port = 2222;
-const msgLog = msg => console.log(msg.toString());
+// хост сервера
+const host = "127.0.0.1";
+// порт сервера
+const port = "2222";
+// функция вывода в консоль
+function msgLog(msg) {
+ console.log(msg.toString());
+}
+// импортируем модуль, позволяющий читать с клавиатуры
 const readline = require("readline");
 ///////////////////////////////////////////////////////////////////////
 /// Event handlers
-const clients = net.connect({ port }, () => {
-    clients.setEncoding('utf8');
-    console.log("connected to server!");
+// Коннектимся к серверу на таком-то хосте и порте и исполняем указанную функцию
+const tcpClient = net.connect({ host, port }, function() {
+    // Ставим кодировку для русских символов
+    tcpClient.setEncoding('utf8');
+    console.log("TCP Клиент присоединился к TCP Серверу");
 });
 
-clients.on("data", data => {
+// Когда получили ответ от сервера, исполнить указанную функцию
+tcpClient.on("data", function(data) {
+    // выводим сообщение от сервера
     msgLog(data);
+    // создаем объект, которая читает с клавиатуры
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout
     });
-    rl.question("Enter next command: ", cmd => {
-        clients.write(cmd);
+    // пишем в консоль просьбу ввести команду, когда пользователь ввел, исполнить функцию
+    rl.question("Введите консольную команду: ", function(cmd) {
+        // отправляем введенную команду на сервер
+        tcpClient.write(cmd.trim());
+        // закрываем объект
         rl.close();
     });
 });
 
-clients.on("end", () => {
-    console.log("disconnected from server");
+// Когда завершаем работу, пишем об этом
+tcpClient.on("end", () => {
+    console.log("TCP Клиент отсоединился от TCP Сервера");
 });
 ///////////////////////////////////////////////////////////////////////
