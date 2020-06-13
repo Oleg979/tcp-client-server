@@ -38,6 +38,7 @@ tcpServer.on("connection", function (client) {
         data = insertCurrentPathToData(currentPath, data);
       }
       else {
+        // Иначе не вставляем, а просто исполняем команду, а потом выводим текущую директорию
         data = `${data} && cd`;
       }
       log(`Клиент исполнил команду ${data}`);
@@ -59,6 +60,7 @@ tcpServer.on("connection", function (client) {
         }
       });
     } 
+    // Если в отправленной пользователем команде НЕ содержится CD
     else {
       if (currentPath) {
         // Вставляем перед ней текущий путь
